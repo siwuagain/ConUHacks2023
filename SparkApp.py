@@ -53,7 +53,7 @@ df_group_by_messagetype = df.groupBy(col('MessageType')).count()
 #Dataframe for Cancelled and Trade
 df_group_by_cancelled = df_By_Minute.select("Time", "Exchange", "Symbol", "OrderPrice", "MessageType", "OrderID").filter(df["MessageType"] == "Cancelled").groupBy("Time", "Exchange").count().orderBy('Time')
 df_group_by_trade = df_By_Minute.select("Time", "Exchange", "Symbol", "OrderPrice", "MessageType", "OrderID").filter(df["MessageType"] == "Trade").groupBy("Time", "Exchange").count().orderBy('Time')
-
+df_group_by_trade.show()
 
 #API
 @app.route('/getByMessageType')
@@ -92,13 +92,31 @@ def get_cancelled_count_by_time():
     for t in range(len(df_group_by_cancelled.select("Time").collect())):
         msg_time_trade.append(df_group_by_cancelled.select("Time").collect()[t][0])
     for t in range(len(df_group_by_cancelled.select("Exchange").collect())):
-        msg_exchange_trade.append( df_group_by_cancelled.select("Exchange").collect()[t][0])
+        msg_exchange_trade.append(df_group_by_cancelled.select("Exchange").collect()[t][0])
+
+    TSX_Cancelled = []
+    TSX_Trade = []
+    Alpha_Cancelled = []
+    Alpha_Trade = []
+    Aequitas_Cancelled = []
+    Aequitas_Trade = []
+    for t in range(len(msg_exchange_trade)):
+        if msg_exchange_cancelled[t] == "TSX":
+            TSX_Cancelled.append({'Time': msg_time_cancelled[t], 'Count': msg_count_cancelled[t]})
+        elif msg_exchange_trade[t] == "TSX":
+            TSX_Trade.append({'Time': msg_time_trade[t], 'Count': msg_count_trade[t]})
+        elif msg_exchange_cancelled[t] == "Alpha":
+            Alpha_Cancelled.append({'Time': msg_time_cancelled[t], 'Count': msg_count_cancelled[t]})
+        elif msg_exchange_trade[t] == "Alpha":
+            Alpha_Trade.append({'Time': msg_time_trade[t], 'Count': msg_count_trade[t]})
+        elif msg_exchange_cancelled[t] == "Aequitas":
+            Aequitas_Cancelled.append({'Time': msg_time_cancelled[t], 'Count': msg_count_cancelled[t]})
+        elif msg_exchange_trade[t] == "Aequitas":
+            Aequitas_Trade.append({'Time': msg_time_trade[t], 'Count': msg_count_trade[t]})
 
     json_data = []
-    for t in range(len(msg_count_cancelled)):
-        json_data.append({'Time': msg_time_cancelled[t], 'Exchange': msg_exchange_cancelled[t], 'Count': msg_count_cancelled[t], 'MessageType': 'Cancelled'})
-
-    for t in range(len(msg_count_cancelled)):
-        json_data.append({'Time': msg_time_trade[t], 'Exchange': msg_exchange_trade[t], 'Count': msg_count_trade[t], 'MessageType': 'Trade'})
+    json_data.append({"Exchange": "TSX", "Trade":TSX_Trade, "Cancelled":TSX_Cancelled})
+    json_data.append({"Exchange": "Alpha", "Trade":Alpha_Trade, "Cancelled":Alpha_Cancelled})
+    json_data.append({"Exchange": "Aequitas", "Trade":Aequitas_Trade, "Cancelled":Aequitas_Cancelled})
 
     return jsonify(json_data)
