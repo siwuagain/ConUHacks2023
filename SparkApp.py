@@ -49,12 +49,10 @@ df_By_Second = df.withColumn("Time", from_unixtime(df["TimeStampEpoch"]/1e9,'yyy
 
 #Dataframe for MessageType and Count
 df_group_by_messagetype = df.groupBy(col('MessageType')).count()
-df_group_by_messagetype.printSchema()
-df_group_by_messagetype.show()
 
 #Dataframe for Cancelled and Trade
 df_group_by_cancelled = df_By_Minute.select("Time", "Exchange", "Symbol", "OrderPrice", "MessageType", "OrderID").filter(df["MessageType"] == "Cancelled").groupBy("Time", "Exchange").count().orderBy('Time')
-df_group_by_cancelled.show()
+df_group_by_trade = df_By_Minute.select("Time", "Exchange", "Symbol", "OrderPrice", "MessageType", "OrderID").filter(df["MessageType"] == "Trade").groupBy("Time", "Exchange").count().orderBy('Time')
 
 
 #API
@@ -76,18 +74,31 @@ def get_by_message_type():
 
 @app.route('/getCancelledCountByTime')
 def get_cancelled_count_by_time():
-    msg_count = []
-    msg_time = []
-    msg_exchange = []
+    msg_count_cancelled = []
+    msg_time_cancelled = []
+    msg_exchange_cancelled = []
     for t in range(len(df_group_by_cancelled.select("count").collect())):
-        msg_count.append(df_group_by_cancelled.select("count").collect()[t][0])
+        msg_count_cancelled.append(df_group_by_cancelled.select("count").collect()[t][0])
     for t in range(len(df_group_by_cancelled.select("Time").collect())):
-        msg_time.append(df_group_by_cancelled.select("Time").collect()[t][0])
+        msg_time_cancelled.append(df_group_by_cancelled.select("Time").collect()[t][0])
     for t in range(len(df_group_by_cancelled.select("Exchange").collect())):
-        msg_exchange.append( df_group_by_cancelled.select("Exchange").collect()[t][0])
+        msg_exchange_cancelled.append( df_group_by_cancelled.select("Exchange").collect()[t][0])
+
+    msg_count_trade = []
+    msg_time_trade = []
+    msg_exchange_trade = []
+    for t in range(len(df_group_by_cancelled.select("count").collect())):
+        msg_count_trade.append(df_group_by_cancelled.select("count").collect()[t][0])
+    for t in range(len(df_group_by_cancelled.select("Time").collect())):
+        msg_time_trade.append(df_group_by_cancelled.select("Time").collect()[t][0])
+    for t in range(len(df_group_by_cancelled.select("Exchange").collect())):
+        msg_exchange_trade.append( df_group_by_cancelled.select("Exchange").collect()[t][0])
 
     json_data = []
-    for t in range(len(msg_count)):
-        json_data.append({'Time': msg_time[t], 'Exchange': msg_exchange[t], 'Count': msg_count[t]})
+    for t in range(len(msg_count_cancelled)):
+        json_data.append({'Time': msg_time_cancelled[t], 'Exchange': msg_exchange_cancelled[t], 'Count': msg_count_cancelled[t], 'MessageType': 'Cancelled'})
+
+    for t in range(len(msg_count_cancelled)):
+        json_data.append({'Time': msg_time_trade[t], 'Exchange': msg_exchange_trade[t], 'Count': msg_count_trade[t], 'MessageType': 'Trade'})
 
     return jsonify(json_data)
