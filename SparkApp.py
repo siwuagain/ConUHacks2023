@@ -53,6 +53,7 @@ df_group_by_messagetype = df.groupBy(col('MessageType')).count()
 #Dataframe for Cancelled and Trade
 df_group_by_cancelled = df_By_Minute.select("Time", "Exchange", "Symbol", "OrderPrice", "MessageType", "OrderID").filter(df["MessageType"] == "Cancelled").groupBy("Time", "Exchange").count().orderBy('Time')
 df_group_by_trade = df_By_Minute.select("Time", "Exchange", "Symbol", "OrderPrice", "MessageType", "OrderID").filter(df["MessageType"] == "Trade").groupBy("Time", "Exchange").count().orderBy('Time')
+df_group_by_cancelled.show()
 df_group_by_trade.show()
 
 #API
@@ -101,18 +102,21 @@ def get_cancelled_count_by_time():
     Aequitas_Cancelled = []
     Aequitas_Trade = []
     for t in range(len(msg_exchange_trade)):
-        if msg_exchange_cancelled[t] == "TSX":
-            TSX_Cancelled.append({'Time': msg_time_cancelled[t], 'Count': msg_count_cancelled[t]})
         if msg_exchange_trade[t] == "TSX":
             TSX_Trade.append({'Time': msg_time_trade[t], 'Count': msg_count_trade[t]})
-        if msg_exchange_cancelled[t] == "Alpha":
-            Alpha_Cancelled.append({'Time': msg_time_cancelled[t], 'Count': msg_count_cancelled[t]})
         if msg_exchange_trade[t] == "Alpha":
             Alpha_Trade.append({'Time': msg_time_trade[t], 'Count': msg_count_trade[t]})
-        if msg_exchange_cancelled[t] == "Aequitas":
-            Aequitas_Cancelled.append({'Time': msg_time_cancelled[t], 'Count': msg_count_cancelled[t]})
         if msg_exchange_trade[t] == "Aequitas":
             Aequitas_Trade.append({'Time': msg_time_trade[t], 'Count': msg_count_trade[t]})
+
+    for t in range(len(msg_exchange_cancelled)):
+        if msg_exchange_cancelled[t] == "TSX":
+            TSX_Cancelled.append({'Time': msg_time_cancelled[t], 'Count': msg_count_cancelled[t]})
+        if msg_exchange_cancelled[t] == "Alpha":
+            Alpha_Cancelled.append({'Time': msg_time_cancelled[t], 'Count': msg_count_cancelled[t]})
+        if msg_exchange_cancelled[t] == "Aequitas":
+            Aequitas_Cancelled.append({'Time': msg_time_cancelled[t], 'Count': msg_count_cancelled[t]})
+
 
     json_data = []
     json_data.append({"Exchange": "TSX", "Trade":TSX_Trade, "Cancelled":TSX_Cancelled})
