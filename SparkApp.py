@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, asc, desc, collect_list, count, when, isnull, isnan, size, to_json, from_json, \
     second, from_unixtime, unix_timestamp
+from flask_cors import CORS
 import sys
 import requests
 from flask import Flask, request, jsonify, make_response
@@ -9,6 +10,7 @@ from pyspark.sql.types import MapType, StringType, StructType, StructField, Inte
 
 app = Flask(__name__)
 
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 ss = SparkSession.builder.master("local[4]").appName("nb_data").getOrCreate();
 sc = ss.sparkContext
