@@ -87,12 +87,12 @@ def get_cancelled_count_by_time():
     msg_count_trade = []
     msg_time_trade = []
     msg_exchange_trade = []
-    for t in range(len(df_group_by_cancelled.select("count").collect())):
-        msg_count_trade.append(df_group_by_cancelled.select("count").collect()[t][0])
-    for t in range(len(df_group_by_cancelled.select("Time").collect())):
-        msg_time_trade.append(df_group_by_cancelled.select("Time").collect()[t][0])
-    for t in range(len(df_group_by_cancelled.select("Exchange").collect())):
-        msg_exchange_trade.append(df_group_by_cancelled.select("Exchange").collect()[t][0])
+    for t in range(len(df_group_by_trade.select("count").collect())):
+        msg_count_trade.append(df_group_by_trade.select("count").collect()[t][0])
+    for t in range(len(df_group_by_trade.select("Time").collect())):
+        msg_time_trade.append(df_group_by_trade.select("Time").collect()[t][0])
+    for t in range(len(df_group_by_trade.select("Exchange").collect())):
+        msg_exchange_trade.append(df_group_by_trade.select("Exchange").collect()[t][0])
 
     TSX_Cancelled = []
     TSX_Trade = []
@@ -103,15 +103,15 @@ def get_cancelled_count_by_time():
     for t in range(len(msg_exchange_trade)):
         if msg_exchange_cancelled[t] == "TSX":
             TSX_Cancelled.append({'Time': msg_time_cancelled[t], 'Count': msg_count_cancelled[t]})
-        elif msg_exchange_trade[t] == "TSX":
+        if msg_exchange_trade[t] == "TSX":
             TSX_Trade.append({'Time': msg_time_trade[t], 'Count': msg_count_trade[t]})
-        elif msg_exchange_cancelled[t] == "Alpha":
+        if msg_exchange_cancelled[t] == "Alpha":
             Alpha_Cancelled.append({'Time': msg_time_cancelled[t], 'Count': msg_count_cancelled[t]})
-        elif msg_exchange_trade[t] == "Alpha":
+        if msg_exchange_trade[t] == "Alpha":
             Alpha_Trade.append({'Time': msg_time_trade[t], 'Count': msg_count_trade[t]})
-        elif msg_exchange_cancelled[t] == "Aequitas":
+        if msg_exchange_cancelled[t] == "Aequitas":
             Aequitas_Cancelled.append({'Time': msg_time_cancelled[t], 'Count': msg_count_cancelled[t]})
-        elif msg_exchange_trade[t] == "Aequitas":
+        if msg_exchange_trade[t] == "Aequitas":
             Aequitas_Trade.append({'Time': msg_time_trade[t], 'Count': msg_count_trade[t]})
 
     json_data = []
